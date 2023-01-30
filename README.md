@@ -1,6 +1,10 @@
 dl-seg-med
 ==============================
 
+Data
+-----
+[Zenodo link](https://zenodo.org/record/6802614)
+
 A short description of the project.
 
 Project Organization

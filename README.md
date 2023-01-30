@@ -7,14 +7,14 @@ Data
 
 Research question
 ------------------
-We have a dataset D_0 containing 100 CT scans partially annotated with 10 classes. On this dataset, some U-net like model M_0 (using only supervised learning approach) is trained and a particular DICE quality metric is observed on a D_val validation dataset (fully annotated).
+We have a dataset D_0 containing 100 CT scans annotated partially with ten classes. On D_0, we train a (baseline) model M_0 (using only supervised learning).
 
-We also have a dataset D_1, containing another 100 CT scans, annotated partially by the maximum of 20 classes (including those from the D_0).
+We also have a dataset D_1, containing another 100 CT scans, partially annotated with 20 classes (including those from the D_0).
 
-Remark. We will simulate D_0, D_1, and D_val by subsampling data from the [open dataset](https://zenodo.org/record/6802614) and changing some labels to 0 (background).
+Remark. We will simulate D_0 and D_1 by subsampling data from the [open dataset](https://zenodo.org/record/6802614) and changing some labels to 0 (background).
 
-Question. Can we build a model M_1 based on combined data (D_0 + D_1) using semi-supervised approach, so that the model M_1 will show better performance (in terms of DICE metric) than M_0 on D_val.
-Additinal question. If D_1 is larger or smaller than D_0, how it will affect the perofrmance gain of M_1
+Question. Can we build a model M_1 based on combined data (D_0 + D_1) using a semi-supervised approach so that the model M_1 performs better than M_0 (at least for some classes)?
+Additional question. If D_1 is larger or smaller than D_0, how will it affect the performance gain of M_1?
 
 Project Organization
 ------------

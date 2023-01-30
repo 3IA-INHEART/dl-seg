@@ -7,7 +7,7 @@ Data
 
 Research question
 ------------------
-We have a dataset D_0 containing 100 CT scans fully annotated with 10 classes (every of the 10 classes is present in each scan). On this dataset, some U-net like model M_0 (using only supervised learning approach) is trained and a particular DICE quality metric is observed on a D_val validation dataset (fully annotated).
+We have a dataset D_0 containing 100 CT scans partially annotated with 10 classes. On this dataset, some U-net like model M_0 (using only supervised learning approach) is trained and a particular DICE quality metric is observed on a D_val validation dataset (fully annotated).
 
 We also have a dataset D_1, containing another 100 CT scans, annotated partially by the maximum of 20 classes (including those from the D_0).
 

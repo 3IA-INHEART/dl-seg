@@ -7,9 +7,10 @@ Data
 
 Research question
 ------------------
-We have a dataset D_0 containing 100 CT scans fully annotated with ten classes + one class for background. On D_0, we train a (baseline) model M_0 (using only supervised learning).
+We have a dataset D_0 containing 100 CT scans fully annotated with six (heart_atrium_left, heart_atrium_right, heart_myocardium, heart_ventricle_left, 
+heart_ventricle_right, aorta) classes + one class for background. On D_0, we train a (baseline) model M_0 (using only supervised learning).
 
-We also have a dataset D_1, containing another 100 CT scans, partially annotated with the same 10 classes as D_0 (for some CTs there are less than 10 classes (i.e. for some CTs in D_1 some binary masks are missing).
+We also have a dataset D_1, containing another 100 CT scans, partially annotated with the same six classes as D_0 (for some CTs there are less than six classes (i.e. for some CTs in D_1 some binary masks are missing, at least one).
 
 Remark. We will simulate D_0 and D_1 by subsampling data from the [open dataset](https://zenodo.org/record/6802614) and changing some labels to 0 (background). Evaluation should be done a test dataset similar to D0 (but with different CTs)
 

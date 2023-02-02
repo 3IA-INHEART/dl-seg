@@ -6,7 +6,8 @@ import torch
 from dl_seg_med.utils.registries import loss_registery, optimizers_registery, schedulers_registry
 from dl_seg_med.training.metrics import Accuracy, AveragePrecision, DiceCoefficient, MeanIoU, PSNR, MSE
 from dl_seg_med.data.ptl.scans_dataset import ScanLearningDataset, ScansDataset, UniqueShapeScanDataset
-
+from monai.visualize import plot_2d_or_3d_image
+from torch.utils.tensorboard import SummaryWriter
 
 class lightningSeg3dModel(pl.LightningModule):
     
@@ -42,19 +43,19 @@ class lightningSeg3dModel(pl.LightningModule):
         train_len = int(val_split_ratio * len(dataset)); valid_len = len(dataset)-train_len;
         self.train_dataset, self.valid_dataset = torch.utils.data.random_split(dataset, [train_len, valid_len], generator=torch.Generator().manual_seed(manual_seed))
         # Sample elements for visualization
-        self.sample_val = self.train_dataset[0]
-        self.sample_train = self.valid_dataset[0]        
+        self.sample_vals = [self.train_dataset[i] for i in (22,50,80,100)]
+        self.sample_trains = [self.valid_dataset[i] for i in (22,50,80,100)]
         self.is_defined_dataset = True
     
     def train_dataloader(self):
         if not self.is_defined_dataset:
             self._set_datasets(**self.hparams["DATASET"])
-        return torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=8, shuffle=True)
+        return torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=0, shuffle=True)
     
     def val_dataloader(self):
         if not self.is_defined_dataset:
             self._set_datasets(**self.hparams["DATASET"])
-        return torch.utils.data.DataLoader(self.valid_dataset, batch_size=self.batch_size, num_workers=8, shuffle=True)
+        return torch.utils.data.DataLoader(self.valid_dataset, batch_size=self.batch_size, num_workers=0, shuffle=True)
     
     def forward(self, images_batch):
         # Forward pass
@@ -101,34 +102,30 @@ class lightningSeg3dModel(pl.LightningModule):
         return self.forward(batch)
     
     def image_grid(self, x, y, preds, prefix):  
-        """
-        preds = self.softmax(preds)
+        
+        #preds = self.softmax(preds)
         classes = torch.argmax(preds,1)
         bs = preds.shape[0]
-                
-        for i in range(bs):
-            fixed_rgb = (x[i]-x[i].min())/(x[i].max()-x[i].min())
-            self.logger.experiment.add_image(prefix+"rgb_{}".format(i),fixed_rgb,self.current_epoch)
-            fixed_gt = y[0][i]
-            self.logger.experiment.add_image(prefix+"gt_{}".format(i),fixed_gt,self.current_epoch)
-            fixed_preds = (preds[i]-preds[i].min())/(preds[i].max()-preds[i].min())
-            self.logger.experiment.add_image(prefix+"preds_{}".format(i),fixed_preds,self.current_epoch)
-            fixed_preds_class = torch.unsqueeze(classes[i],0)/self.n_classes
-            self.logger.experiment.add_image(prefix+"preds_class_{}".format(i),fixed_preds_class,self.current_epoch)
-        """
+        plot_2d_or_3d_image(data=x, step=0, writer=SummaryWriter(self.logger.log_dir), frame_dim=-1, tag=f"x_{prefix}")
+        plot_2d_or_3d_image(data=y, step=0, writer=SummaryWriter(self.logger.log_dir), frame_dim=-1, tag=f"y_{prefix}")
+        plot_2d_or_3d_image(data=preds, step=self.current_epoch, writer=SummaryWriter(self.logger.log_dir), frame_dim=-1, tag=f"pred_{prefix}")
         pass
     
     def validation_epoch_end(self, outputs):
         
-        """if hasattr(self, "sample_val"):
-            X,Y = self.sample_val
-            logits = self.forward(X.to(self.device))            
-            self.image_grid(X, Y, logits, "val_")
-        if hasattr(self, "sample_train"):
-            X,Y = self.sample_train
-            logits = self.forward(X.to(self.device))            
-            self.image_grid(X, Y, logits, "train_")
-        """
+        if hasattr(self, "sample_vals"):
+            for s_idx,sample_val in enumerate(self.sample_vals):
+                X,Y = sample_val
+                X=torch.tensor(np.expand_dims(X,0)); Y=torch.tensor(np.expand_dims(Y,0))
+                logits = self.forward(X.to(self.device))            
+                self.image_grid(X, Y, logits, f"val_{s_idx}_")
+        if hasattr(self, "sample_trains"):
+            for s_idx,sample_train in enumerate(self.sample_trains):
+                X,Y = sample_train
+                X=torch.tensor(np.expand_dims(X,0)); Y=torch.tensor(np.expand_dims(Y,0))
+                logits = self.forward(X.to(self.device))            
+                self.image_grid(X, Y, logits, f"train_{s_idx}_")
+        
         combined_scores = {
             metric_key: np.mean([x[metric_key] for x in outputs])
             for metric_key in outputs[0]

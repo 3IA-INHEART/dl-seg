@@ -1,0 +1,25 @@
+
+
+MODEL_CHECKPOINT_CALLBACK:
+  USE: true
+  PARAMS:
+    dirpath: null
+    mode: max
+    save_top_k: -1
+    monitor: accuracy
+
+EARLY_STOPPING:
+  USE: false
+
+TENSORBOARD_LOGGER:
+  USE: true
+  LOG_PATH: null
+  NAME: benchmark
+
+LIGHTNING_PARAMS:
+  overfit_batches: 5
+  log_every_n_steps: 5
+  max_epochs: 20
+  min_epochs: 3
+  auto_lr_find: false
+  gpus: 1

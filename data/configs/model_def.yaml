@@ -1,15 +1,15 @@
 
 arch: Unet_3D
-encoder_name: resnet34_3D
+encoder_name: resnet18_3D
 encoder_weights: null
 in_channels: 1
 classes: 7
 decoder_channels:
-  - 128
-  - 128
+  - 64
   - 64
   - 32
   - 16
+  - 8
 decoder_use_batchnorm: false
 decoder_attention_type: null
 lr: 1.0e-3
